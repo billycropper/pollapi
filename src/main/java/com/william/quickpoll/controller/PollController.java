@@ -2,10 +2,12 @@ package com.william.quickpoll.controller;
 
 import com.william.quickpoll.domain.Poll;
 import com.william.quickpoll.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.william.quickpoll.repository.PollRepository;
 
@@ -15,9 +17,10 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 public class PollController {
 
-    @Inject
+    @Autowired
     private PollRepository pollRepository;
 
     @RequestMapping(value = "/polls", method = RequestMethod.GET)
@@ -56,10 +59,18 @@ public class PollController {
 
     @RequestMapping(value = "/polls/{pollId}", method = RequestMethod.PUT)
     public ResponseEntity<?> updatePoll(@RequestBody Poll poll, @PathVariable Long pollId){
+        if (pollRepository.existsById(pollId)){
+            verifyPoll((pollId));
+            pollRepository.save(poll);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return createPoll(poll);
+        }
+
         //Save entity
-        verifyPoll(pollId);
-        pollRepository.save(poll);
-        return new ResponseEntity<>(HttpStatus.OK);
+//        verifyPoll(pollId);
+//        pollRepository.save(poll);
+//        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/polls/{pollId}", method = RequestMethod.DELETE)

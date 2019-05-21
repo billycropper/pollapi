@@ -14,6 +14,38 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+//
+//@RestController
+//public class ComputeResultController {
+//
+//    @Inject
+//    private VoteRepository voteRepository;
+//
+//    @RequestMapping(value = "/computeresult", method = RequestMethod.GET)
+//    public ResponseEntity<?> computeResult(@RequestParam Long pollId){
+//        VoteResult voteResult = new VoteResult();
+//        Iterable<Vote> allVotes = voteRepository.findByPoll(pollId);
+//
+//        int totalVotes = 0;
+//        Map<Long, OptionCount> tempMap = new HashMap<>();
+//        for(Vote v : allVotes){
+//            totalVotes++;
+//            //Get the OptionCount corresponding to this Option
+//            OptionCount optionCount = tempMap.get(v.getOption().getId());
+//            if(optionCount == null){
+//                optionCount = new OptionCount();
+//                optionCount.setOptionId(v.getOption().getId());
+//                tempMap.put(v.getOption().getId(), optionCount);
+//            }
+//            optionCount.setCount(optionCount.getCount()+1);
+//        }
+//        voteResult.setTotalVotes(totalVotes);
+//        voteResult.setResults(tempMap.values());
+//
+//        return new ResponseEntity<VoteResult>(voteResult, HttpStatus.OK);
+//    }
+//}
+
 
 @RestController
 public class ComputeResultController {
@@ -21,27 +53,31 @@ public class ComputeResultController {
     @Inject
     private VoteRepository voteRepository;
 
-    @RequestMapping(value = "/computerresult", method = RequestMethod.GET)
-    public ResponseEntity<?> computeResult(@RequestParam Long pollId){
+
+    @RequestMapping(value="/computeresult", method=RequestMethod.GET)
+    public ResponseEntity<?> computeResult(@RequestParam Long pollId) {
         VoteResult voteResult = new VoteResult();
         Iterable<Vote> allVotes = voteRepository.findByPoll(pollId);
 
+        // Algorithm to count votes
         int totalVotes = 0;
-        Map<Long, OptionCount> tempMap = new HashMap<Long, OptionCount>();
-        for(Vote v : allVotes){
-            totalVotes++;
-            //Get the OptionCount corresponding to this Option
+        Map<Long, OptionCount> tempMap = new HashMap<>();
+        for(Vote v : allVotes) {
+            totalVotes ++;
+            // Get the OptionCount corresponding to this Option
             OptionCount optionCount = tempMap.get(v.getOption().getId());
-            if(optionCount == null){
+            if(optionCount == null) {
                 optionCount = new OptionCount();
                 optionCount.setOptionId(v.getOption().getId());
                 tempMap.put(v.getOption().getId(), optionCount);
             }
             optionCount.setCount(optionCount.getCount()+1);
         }
-        voteResult.setTotalValues(totalVotes);
+
+        voteResult.setTotalVotes(totalVotes);
         voteResult.setResults(tempMap.values());
 
-        return new ResponseEntity<VoteResult>(voteResult, HttpStatus.OK);
+        return new ResponseEntity<>(voteResult, HttpStatus.OK);
     }
+
 }
